@@ -36,9 +36,9 @@ public class GameInput : MonoBehaviour
     }
     public Vector2 GetMovedir()
     {
-      
-        return Movedir;
-        
+
+        return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
     }
     
 }
