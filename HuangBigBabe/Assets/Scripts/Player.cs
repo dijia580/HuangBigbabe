@@ -12,12 +12,18 @@ public class Player : MonoBehaviour
     private StateMachine stateMachine;
 
     //for controling move.x
-    private float acclration = 60f;
-    private float declration = 80f;
-    private float Maxspeed = 5f;
-    public Vector2 movedir;
-    private float curentspeed;
+    private float acclration = 60f;  //最大加速度
+    private float declration = 80f;  //最大减速度
+    private float Maxspeed = 5f;  //最大移动速度
+    public Vector2 movedir;    //移动方向
+    public float FacingDirection { get; private set; } = 1f;
 
+    public float DashcooldownTimer = 0f;
+
+    public float AtkcooldownTimer;
+    public bool CanDash() => DashcooldownTimer <= 0;
+    public bool CanAtk() => AtkcooldownTimer <= 0;
+    public bool IsGround { get; private set; }
 
 
 
@@ -34,7 +40,9 @@ public class Player : MonoBehaviour
         stateMachine.AddState(new IdleState(stateMachine, this));
         stateMachine.AddState(new MoveState(stateMachine, this));
         stateMachine.AddState(new JumpState(stateMachine, this));
-        stateMachine.SwitchState<IdleState>();
+        stateMachine.AddState(new DashState(stateMachine, this));
+        stateMachine.AddState(new ATKState(stateMachine, this));
+        
 
 
         animator = GetComponent<Animator>();
@@ -44,36 +52,68 @@ public class Player : MonoBehaviour
     private void Update()
     {
         movedir = GameInput.Instance.GetMovedir();
-
+        Checkisground();
         stateMachine.Update();
 
+
+        if (DashcooldownTimer > 0)
+        {
+            DashcooldownTimer -= Time.deltaTime;
+        }
+        if(AtkcooldownTimer>0)
+        {
+            AtkcooldownTimer -= Time.deltaTime;
+        }
+
+       
 
     }
     private void Start()
     {
-        GameInput.Instance.OnJumpWasClick += Instance_OnJumpWasClick;
+        GameInput.Instance.OnDashWasClick += Instance_OnDashWasClick;
+        GameInput.Instance.OnATKWasClick += Instance_OnATKWasClick;
+        stateMachine.SwitchState<IdleState>();
     }
 
-    private void Instance_OnJumpWasClick(object sender, System.EventArgs e)
+    private void Instance_OnATKWasClick(object sender, System.EventArgs e)
     {
-        if (GetIsGround())
+        
+        if (!(stateMachine.currentState is ATKState)&&CanAtk())
         {
-            stateMachine.SwitchState<JumpState>();
+            stateMachine.SwitchState<ATKState>();
         }
     }
 
+    private void Instance_OnDashWasClick(object sender, System.EventArgs e)
+    {
+        if(!(stateMachine.currentState is DashState)&&CanDash())
+        {
+            stateMachine.SwitchState<DashState>();
+        }
+    }
 
     private void FixedUpdate()
     {
         stateMachine.FixedUpdate();
 
     }
+    //移动相关逻辑供movestate和jumpstate调用
     public void HandleMove()
     {
-        if (movedir.x >= 0)
-            transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);   // 面朝右
-        else
-            transform.localScale = new Vector3(-0.06f, 0.06f, 0.06f);  // 面朝左
+        float curentspeed;
+        if (movedir.x != 0)
+        {
+            if (movedir.x >= 0)
+            {
+                transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+                FacingDirection = 1f;
+            }
+            else
+            {
+                transform.localScale = new Vector3(-0.06f, 0.06f, 0.06f);
+                FacingDirection = -1f;
+            }
+        }
         curentspeed = rb.velocity.x;
         float accl = Mathf.Abs(curentspeed) > 0.1 ? acclration : declration;
         float targetspeed = movedir.x * Maxspeed;
@@ -81,18 +121,14 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(a, rb.velocity.y);
 
     }
-    public bool GetIsGround()
+    public void Checkisground()
     {
 
-        float raycastHistDistance = 0.5f;
-        if (Physics2D.Raycast(transform.position, Vector2.down, raycastHistDistance, GroundLayer))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        float raycastHistDistance = 0.05f;
+       IsGround= Physics2D.Raycast(transform.position, Vector2.down, raycastHistDistance, GroundLayer);
+        Debug.DrawRay(transform.position, Vector2.down * raycastHistDistance, IsGround ? Color.green : Color.red);
+
+
     }
 
 }

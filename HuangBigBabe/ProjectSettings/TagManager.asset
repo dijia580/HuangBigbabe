@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 2324350759
+    locked: 0
+  - name: Diction
+    uniqueID: 4046572191
+    locked: 0

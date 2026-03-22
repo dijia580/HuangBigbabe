@@ -14,15 +14,22 @@ public class JumpState : State
 
     public override void On_Enter()
     {
-        player.rb.AddForce(player.JumpFprce * Vector2.up, ForceMode2D.Impulse);
+        if (player.IsGround)
+        {
+            player.rb.AddForce(Vector2.up*player.JumpFprce, ForceMode2D.Impulse);
+        }
+
     }
+
+   
+
     public override void FixedUpdate()
     {
-
+        player.HandleMove();
     }
     public override void Update()
     {
-        if (player.GetIsGround() && player.rb.velocity.y <= 0)
+        if (player.IsGround && player.rb.velocity.y <= 0)
         {
             // 根据是否有移动输入决定切换到 Idle 还是 Move
             if (player.movedir != Vector2.zero)

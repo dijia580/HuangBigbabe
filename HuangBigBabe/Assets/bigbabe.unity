@@ -142,6 +142,8 @@ MonoBehaviour:
   rb: {fileID: 130895232}
   animator: {fileID: 130895235}
   movedir: {x: 0, y: 0}
+  DashcooldownTimer: 0
+  AtkcooldownTimer: 0
   GroundLayer:
     serializedVersion: 2
     m_Bits: 64
