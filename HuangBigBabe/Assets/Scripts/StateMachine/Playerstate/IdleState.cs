@@ -25,7 +25,7 @@ public class IdleState : State
 
     private void Instance_OnJumpWasClick(object sender, EventArgs e)
     {
-        if (player.IsGround)
+        if (player.GetIsGround())
             stateMachine.SwitchState<JumpState>();
     }
 

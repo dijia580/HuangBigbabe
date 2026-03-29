@@ -21,7 +21,8 @@ public class ATKState : State
     public override void On_Enter()
     {
         player.animator.SetTrigger(ATK);
-
+        Debug.Log("¼ì²âÄÜ·ñ¹¥»÷");
+        Atk();
         player.AtkcooldownTimer = AtkCoolDown;
         AtkTimerLeft = AtkDuration;
         
@@ -30,10 +31,14 @@ public class ATKState : State
     public override void Update()
     {
         AtkTimerLeft -= Time.deltaTime;
-
-        if(AtkTimerLeft<=0)
+        CheckState();
+       
+    }
+    private void CheckState ()
+    {
+        if (AtkTimerLeft <= 0)
         {
-            if(player.IsGround)
+            if (player.GetIsGround())
             {
                 if (player.movedir != Vector2.zero)
                 {
@@ -50,6 +55,16 @@ public class ATKState : State
                 stateMachine.SwitchState<JumpState>();
             }
         }
+    }
+    private void Atk()
+    {
+        Debug.Log(player.player_ColliderControl.hasEnemy);
+        if(player.player_ColliderControl.hasEnemy)
+        {
+            Debug.Log("·´»÷·´»÷");
+        }
+        
+        
     }
     public override void Exit()
     {

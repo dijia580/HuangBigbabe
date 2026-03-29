@@ -1,11 +1,11 @@
-using System.Collections;
+锘縰sing System.Collections;
 using System.Collections.Generic;
 using Unity.XR.OpenVR;
 using UnityEngine;
 
 public class JumpState : State
 {
-
+   
     private Player player;
     public JumpState(StateMachine stateMachine, Player player) : base(stateMachine)
     {
@@ -14,11 +14,14 @@ public class JumpState : State
 
     public override void On_Enter()
     {
-        if (player.IsGround)
-        {
-            player.rb.AddForce(Vector2.up*player.JumpFprce, ForceMode2D.Impulse);
-        }
 
+        if (player.GetIsGround())
+        {
+            Vector2 vel = player.rb.velocity;
+            vel.y =player. JumpFprce;
+            player.rb.velocity = vel;
+
+        }
     }
 
    
@@ -26,12 +29,15 @@ public class JumpState : State
     public override void FixedUpdate()
     {
         player.HandleMove();
+        
+
+
     }
     public override void Update()
     {
-        if (player.IsGround && player.rb.velocity.y <= 0)
+        if (player.GetIsGround() && player.rb.velocity.y <= 0)
         {
-            // 根据是否有移动输入决定切换到 Idle 还是 Move
+            // 鏍规嵁鏄惁鏈夌Щ鍔ㄨ緭鍏ュ喅瀹氬垏鎹㈠埌 Idle 杩樻槸 Move
             if (player.movedir != Vector2.zero)
                 stateMachine.SwitchState<MoveState>();
             else

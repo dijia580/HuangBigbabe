@@ -16,15 +16,16 @@ public class MoveState : State
     public override void On_Enter()
     {
 
-        GameInput.Instance.OnJumpWasClick += Instance_OnJumpWasClick
-            ;
+        GameInput.Instance.OnJumpWasClick += Instance_OnJumpWasClick;
+            
         player.animator.SetBool(ISWALK, true);
     }
 
     private void Instance_OnJumpWasClick(object sender, System.EventArgs e)
     {
-        if(player.IsGround)
+        if(player.GetIsGround())
         stateMachine.SwitchState<JumpState>();
+        
     }
 
     public override void Update()
@@ -41,5 +42,6 @@ public class MoveState : State
     public override void Exit()
     {
         GameInput.Instance.OnJumpWasClick -= Instance_OnJumpWasClick;
+        player.rb.velocity = Vector2.zero;
     }
 }
